@@ -6,13 +6,14 @@ export default function UsersList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Fetch users on mount
   useEffect(() => {
     async function fetchUsers() {
       try {
         const res = await getUsers();
-        setUsers(res.data);
+        setUsers(res.data); // backend returns array of users
       } catch (err) {
-        setError(err.message || 'Failed to fetch');
+        setError(err.response?.data?.error || err.message || 'Failed to fetch');
       } finally {
         setLoading(false);
       }
@@ -20,30 +21,40 @@ export default function UsersList() {
     fetchUsers();
   }, []);
 
+  // Handle user delete
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this user?')) return;
     try {
       await deleteUser(id);
-      setUsers(prev => prev.filter(u => u.id !== id));
+      setUsers((prev) => prev.filter((u) => u.user_id !== id));
     } catch (err) {
-      alert('Delete failed');
+      alert('Delete failed: ' + (err.response?.data?.error || err.message));
     }
   };
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
+  if (loading) return <div>Loading users...</div>;
+  if (error) return <div style={{ color: 'red' }}>Error: {error}</div>;
 
   return (
     <div>
       <h2>Users</h2>
-      <ul>
-        {users.map(u => (
-          <li key={u.id}>
-            {u.name} ({u.email})
-            <button onClick={() => handleDelete(u.id)} style={{ marginLeft: 8 }}>Delete</button>
-          </li>
-        ))}
-      </ul>
+      {users.length === 0 ? (
+        <p>No users found.</p>
+      ) : (
+        <ul>
+          {users.map((u) => (
+            <li key={u.user_id}>
+              <strong>{u.name}</strong> ({u.email}) – {u.role}
+              <button
+                onClick={() => handleDelete(u.user_id)}
+                style={{ marginLeft: 8, color: 'red' }}
+              >
+                Delete
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

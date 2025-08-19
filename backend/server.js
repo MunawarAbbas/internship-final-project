@@ -24,14 +24,14 @@ app.use(express.json());
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const roomRoutes = require('./routes/roomRoutes');
-const booksRoutes = require('./routes/booksRoutes');
+const bookingRoutes = require('./routes/bookingRoutes');
 const employeesRoutes = require('./routes/employeesRoutes');
 const reviewsRoutes = require('./routes/reviewsRoutes');
 const roomHistoryRoutes = require('./routes/roomHistoryRoutes');
 
 app.use('/api/users', userRoutes);
 app.use('/api/rooms', roomRoutes);
-app.use('/api/books', booksRoutes);
+app.use('/api/bookings', bookingRoutes);
 app.use('/api/employees', employeesRoutes);
 app.use('/api/reviews', reviewsRoutes);
 app.use('/api/room_history', roomHistoryRoutes);

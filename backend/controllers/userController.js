@@ -30,24 +30,35 @@ exports.getUserById = async (req, res) => {
   }
 };
 
-// Create new user (admin only)
+
+// Create new user (admin only OR registration)
 exports.createUser = async (req, res) => {
   try {
     const { name, email, password, contact, role } = req.body;
 
     if (!password) return res.status(400).json({ error: 'Password is required' });
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const [result] = await db.query(
       'INSERT INTO users (name, email, password, contact, role) VALUES (?, ?, ?, ?, ?)',
       [name, email, hashedPassword, contact || null, role || 'guest']
     );
-    res.status(201).json({ user_id: result.insertId, name, email, contact, role });
+
+    res.status(201).json({
+      user_id: result.insertId,
+      name,
+      email,
+      contact,
+      role: role || 'guest'
+    });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Database insert error' });
+    console.error('❌ Registration failed:', err);  // ← log full error
+    res.status(500).json({ error: err.message });   // ← send actual SQL error to frontend
   }
 };
+
+
 
 // Update user (admin or self)
 exports.updateUser = async (req, res) => {

@@ -1,13 +1,16 @@
 const express = require('express');
 const router = express.Router();
-const userController = require('../controllers/userController');
-const { verifyToken, isAdmin } = require('../middleware/auth'); // import your JWT middleware
+const userController = require('../controllers/userController');  // ✅ fixed
+const { verifyToken, isAdmin } = require('../middleware/auth');  
+const adminOnly = require('../middleware/admin');
 
-// All routes are now protected and admin-only
-router.get('/', verifyToken, isAdmin, userController.getAllUsers);
-router.get('/:id', verifyToken, isAdmin, userController.getUserById);
-router.post('/', verifyToken, isAdmin, userController.createUser);
-router.put('/:id', verifyToken, isAdmin, userController.updateUser);
-router.delete('/:id', verifyToken, isAdmin, userController.deleteUser);
+// Public registration (no auth required)
+router.post('/', userController.createUser);
+
+// Protected (admin only)
+router.get('/', verifyToken, adminOnly, userController.getAllUsers);
+router.get('/:id', verifyToken, userController.getUserById);
+router.put('/:id', verifyToken, userController.updateUser);
+router.delete('/:id', verifyToken, adminOnly, userController.deleteUser);
 
 module.exports = router;
